@@ -20,11 +20,18 @@ class Recurser(object):
         self.parent = parent
         self.suffix = suffix
 
+        # get specials from parent if defined
+        self.specials = self._get_root().specials if self.parent else {
+            "__dot__": ".",
+            "__sl__": "/",
+        }
+
     def __call__(self, *args, **kwargs):
         if args and kwargs:
             raise ValueError("You can use only *args OR **kwargs!")
 
         url = self._get_url(True)
+        url = self._replace_specials(url)
 
         # add suffix to non-domain urls
         if self.parent.parent and self.suffix:
@@ -32,6 +39,21 @@ class Recurser(object):
 
         # params = args if args else kwargs
         return self.url, url, args
+
+    def _replace_specials(self, url):
+        """
+        In `url` replace keys from :attr:`specials` with correspondings vals.
+
+        Args:
+            url (str): String where the values are replaced.
+
+        Returns:
+            str: Updated string.
+        """
+        for key, val in self.specials.iteritems():
+            url = url.replace(key, val)
+
+        return url
 
     def _get_root(self):
         """
