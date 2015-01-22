@@ -23,7 +23,8 @@ class Recurser(object):
         # get specials from parent if defined
         self.specials = self._get_root().specials if self.parent else {
             "__dot__": ".",
-            "__sl__": "/",
+            "__slash__": "/",
+            "__dash__": "-",
         }
 
     def __call__(self, *args, **kwargs):
@@ -68,6 +69,17 @@ class Recurser(object):
         return self
 
     def _get_url(self, called=False):
+        """
+        Compose url from self and all previous items in linked list.
+
+        Args:
+            called (bool, default False): Switch to let the function knows,
+                   that it should ignore the last part of the URL, which is
+                   method type.
+
+        Returns:
+            str: Composed URL.
+        """
         if not self.parent:
             return self.url
 
@@ -78,6 +90,9 @@ class Recurser(object):
             return join(self.parent._get_url(), self.url)
 
     def __getattr__(self, attr):
+        """
+        Take care of URL compostion.
+        """
         return self.__dict__.get(
             attr,
             Recurser(attr, self, self.suffix)
