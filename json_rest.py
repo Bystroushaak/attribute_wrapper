@@ -9,12 +9,23 @@ import requests
 from os.path import join
 
 
-# Variables ===================================================================
-
-
-
 # Functions & classes =========================================================
-class Recurser(object):
+def http_handler(method, url, data):
+    resp = requests.request(method, url, params=data)
+
+    return resp.text
+
+
+def json_handler(method, url, data):
+    if data:
+        data = json.dumps(data)
+
+    resp = requests.request(method, url, data=data)
+
+    return json.loads(resp.text)
+
+
+class JSONWrapper(object):
     def __init__(self, url, parent=None, suffix=None):
         self.url = url
         self.parent = parent
@@ -26,10 +37,11 @@ class Recurser(object):
             "__slash__": "/",
             "__dash__": "-",
         }
+        self.download_handler = json_handler
 
-    def __call__(self, *args, **kwargs):
-        if args and kwargs:
-            raise ValueError("You can use only *args OR **kwargs!")
+    def __call__(self, **kwargs):
+        # if args and kwargs:
+            # raise ValueError("You can use only *args OR **kwargs!")
 
         url = self._get_url(True)
         url = self._replace_specials(url)
@@ -39,7 +51,11 @@ class Recurser(object):
             url += self.suffix
 
         # params = args if args else kwargs
-        return self.url, url, args
+        return self.download_handler(
+            method=self.url,  # this is the last part of the attribute access
+            url=url,
+            data=kwargs if kwargs else None,
+        )
 
     def _replace_specials(self, url):
         """
@@ -91,13 +107,21 @@ class Recurser(object):
 
     def __getattr__(self, attr):
         """
-        Take care of URL compostion.
+        Take care of URL composition.
         """
         return self.__dict__.get(
             attr,
-            Recurser(attr, self, self.suffix)
+            self.__class__(attr, self, self.suffix)
         )
 
-r = Recurser("http://kitakitsune.org", suffix=".html")
-print r.get()
-print r.azgabash.asd.last__dot__fm.get("asd")
+
+class HTTPWrapper(JSONWrapper):
+    def __init__(self, *args, **kwargs):
+        super(HTTPWrapper, self).__init__(*args, **kwargs)
+        self.download_handler = http_handler
+
+
+
+r = HTTPWrapper("http://kitakitsune.org", suffix=".html")
+r.get()
+# print r.azgabash.asd.last__dot__fm.get("asd")
