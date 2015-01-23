@@ -9,23 +9,28 @@ import requests
 from os.path import join
 
 
-# Functions & classes =========================================================
-def http_handler(method, url, data):
-    resp = requests.request(method, url, params=data)
+# Classes =====================================================================
+class GenericWrapper(object):
+    """
+    Generic attribute-access object, which create URL paths from attribute
+    calls.
 
-    return resp.text
+    Each attribute access (``.path`` for example) is mapped to URL path
+    (``URL/path`` for example).
 
+    Each call of the attribute (``obj.path.get()``) is then translated to
+    :method:`.download_handler` call as ``.download_handler("get", "URL/path",\
+    **kwargs)``.
 
-def json_handler(method, url, data):
-    if data:
-        data = json.dumps(data)
+    You can subclass this class and redefine :method:`.download_handler` to
+    server your own needs - see :class:`JSONWrapper` and :class:`HTTPWrapper`.
 
-    resp = requests.request(method, url, data=data)
-
-    return json.loads(resp.text)
-
-
-class JSONWrapper(object):
+    Attributes:
+        url (str): Part of the URL in linked list chain. See
+                   :method:`.get_url` for details.
+        parent (obj): Reference to parent in linked list chain.
+        suffix (str): Optional suffix, which will be added to URL.
+    """
     def __init__(self, url, parent=None, suffix=None):
         self.url = url
         self.parent = parent
@@ -37,13 +42,27 @@ class JSONWrapper(object):
             "__slash__": "/",
             "__dash__": "-",
         }
-        self.download_handler = json_handler
+
+    def download_handler(self, method, url, data):
+        """
+        Here should be your definition of this method, which is expected to
+        take some data and return result.
+
+        Args:
+            method (str): Last part of the attribute path before call -
+                   ``obj.something.get()`` will render `get` as `method`.
+            url (str): Hopefully valid URL composed from attribute paths.
+            data (dict): Parameters given to attribute call.
+        """
+        raise NotImplementedError(
+            "You should implement `.download_handler()` in your code!"
+        )
 
     def __call__(self, **kwargs):
-        # if args and kwargs:
-            # raise ValueError("You can use only *args OR **kwargs!")
-
-        url = self._get_url(True)
+        """
+        Handle calls to attribute.
+        """
+        url = self.get_url(True)
         url = self._replace_specials(url)
 
         # add suffix to non-domain urls
@@ -84,7 +103,7 @@ class JSONWrapper(object):
 
         return self
 
-    def _get_url(self, called=False):
+    def get_url(self, called=False):
         """
         Compose url from self and all previous items in linked list.
 
@@ -101,9 +120,9 @@ class JSONWrapper(object):
 
         # last call (called=True) is used for determining http method
         if called:
-            return self.parent._get_url()
+            return self.parent.get_url()
         else:
-            return join(self.parent._get_url(), self.url)
+            return join(self.parent.get_url(), self.url)
 
     def __getattr__(self, attr):
         """
@@ -115,13 +134,33 @@ class JSONWrapper(object):
         )
 
 
-class HTTPWrapper(JSONWrapper):
-    def __init__(self, *args, **kwargs):
-        super(HTTPWrapper, self).__init__(*args, **kwargs)
-        self.download_handler = http_handler
+class JSONWrapper(GenericWrapper):
+    """
+    Special example of :class:`GenericWrapper`, which translates all calls
+    and given data to JSON and send it **as body** to given URL.
+
+    Functions also adds ``content-type: application/json`` header to each
+    request.
+    """
+    def download_handler(self, method, url, data):
+        if data:
+            data = json.dumps(data)
+
+        headers = {
+            'content-type': 'application/json'
+        }
+
+        resp = requests.request(method, url, headers=headers, data=data)
+
+        return json.loads(resp.text)
 
 
+class HTTPWrapper(GenericWrapper):
+    """
+    Example of :class:`GenericWrapper`, which translates all calls and given
+    data to HTTP form parameters.
+    """
+    def download_handlear(self, method, url, data):
+        resp = requests.request(method, url, params=data)
 
-r = HTTPWrapper("http://kitakitsune.org", suffix=".html")
-r.get()
-# print r.azgabash.asd.last__dot__fm.get("asd")
+        return resp.text
