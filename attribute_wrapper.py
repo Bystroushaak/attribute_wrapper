@@ -32,6 +32,10 @@ class GenericWrapper(object):
         suffix (str): Optional suffix, which will be added to URL.
     """
     def __init__(self, url, parent=None, suffix=None):
+        """
+        Args:
+            url (self): Base URL of the HTTP resource you want to access.
+        """
         self.url = url
         self.parent = parent
         self.suffix = suffix
@@ -160,7 +164,7 @@ class HTTPWrapper(GenericWrapper):
     Example of :class:`GenericWrapper`, which translates all calls and given
     data to HTTP form parameters.
     """
-    def download_handlear(self, method, url, data):
+    def download_handler(self, method, url, data):
         resp = requests.request(method, url, params=data)
 
         return resp.text
