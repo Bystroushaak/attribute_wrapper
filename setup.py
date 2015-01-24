@@ -6,8 +6,6 @@
 # Imports =====================================================================
 from setuptools import setup, find_packages
 
-from docs import getVersion
-
 
 # Variables ===================================================================
 changelog = open('CHANGES.rst').read()
@@ -18,6 +16,23 @@ long_description = "\n\n".join([
 
 
 # Functions & classes =========================================================
+def allSame(s):
+    return not filter(lambda x: x != s[0], s)
+
+
+def hasDigit(s):
+    return any(map(lambda x: x.isdigit(), s))
+
+
+def getVersion(data):
+    data = data.splitlines()
+    return filter(
+        lambda (x, y):
+            len(x) == len(y) and allSame(y) and hasDigit(x) and "." in x,
+        zip(data, data[1:])
+    )[0][0]
+
+
 setup(
     name='attribute_wrapper',
     version=getVersion(changelog),
