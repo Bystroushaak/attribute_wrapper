@@ -91,7 +91,7 @@ As example subclass, there is also ``JSONWrapper``, which translates all paramet
 
 Subclassing
 -----------
-The code is actually really simple (170 lines!) and it should be (at least I think) easy to understand. If you need some new functionality, you can just simply subclass the ``GenericWrapper`` class and rewrite the ``.download_handler()`` method to reflect your needs.
+The code is actually really simple (138 lines!) and it should be (at least I think) easy to understand. If you need some new functionality, you can just simply subclass the ``GenericWrapper`` class and rewrite the ``.download_handler()`` method to reflect your needs.
 
 For example - the ``JSONWrapper`` is implemented in few lines of code:
 
@@ -109,6 +109,9 @@ For example - the ``JSONWrapper`` is implemented in few lines of code:
             }
 
             resp = requests.request(method, url, headers=headers, data=data)
+
+            # handle http errors
+            resp.raise_for_status()
 
             return json.loads(resp.text)
 

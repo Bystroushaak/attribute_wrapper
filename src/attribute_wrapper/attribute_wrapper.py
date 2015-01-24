@@ -156,6 +156,9 @@ class JSONWrapper(GenericWrapper):
 
         resp = requests.request(method, url, headers=headers, data=data)
 
+        # handle http errors
+        resp.raise_for_status()
+
         return json.loads(resp.text)
 
 
@@ -166,5 +169,8 @@ class HTTPWrapper(GenericWrapper):
     """
     def download_handler(self, method, url, data):
         resp = requests.request(method, url, params=data)
+
+        # handle http errors
+        resp.raise_for_status()
 
         return resp.text
