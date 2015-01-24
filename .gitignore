@@ -1,0 +1,4 @@
+src/attribute_wrapper.egg-info/*
+docs/_build/*
+dist/*
+*.pyc
