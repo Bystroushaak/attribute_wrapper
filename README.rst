@@ -1,11 +1,11 @@
 AttributeWrapper
 ================
 
-.. image:: https://badge.fury.io/py/bottle-gui.png
-    :target: http://badge.fury.io/py/bottle-gui
+.. image:: https://badge.fury.io/py/attribute_wrapper.png
+    :target: http://badge.fury.io/py/attribute_wrapper
 
-.. image:: https://pypip.in/d/bottle-gui/badge.png
-        :target: https://crate.io/packages/bottle-gui?version=latest
+.. image:: https://pypip.in/d/attribute_wrapper/badge.png
+        :target: https://crate.io/packages/attribute_wrapper?version=latest
 
 This wrapper maps attribute calls to HTTP API. The package provides similar
 functionality as `Tortilla <https://github.com/redodo/tortilla>`_, but it is
