@@ -26,6 +26,11 @@ def p():
     return ReturnWrapper("http://kitakitsune.org")
 
 
+@pytest.fixture
+def r():
+    return ReturnWrapper("return")
+
+
 # Tests =======================================================================
 def test_wrapper():
     p = ReturnWrapper("return")
@@ -48,11 +53,29 @@ def test_other_methods(p):
 
 def test_no_method_given(p):
     with pytest.raises(ValueError):
-        assert p() == ("a", "http://kitakitsune.org", None)
+        assert p()
 
 
 def test_multiple_attributes(p):
-    assert p.a() == ("a", "http://kitakitsune.org", None)
-    assert p.b.a() == ("a", "http://kitakitsune.org/b", None)
-    assert p.c.b.a() == ("a", "http://kitakitsune.org/c/b", None)
-    assert p.d.c.b.a() == ("a", "http://kitakitsune.org/d/c/b", None)
+    assert p.m() == ("m", "http://kitakitsune.org", None)
+    assert p.b.m() == ("m", "http://kitakitsune.org/b", None)
+    assert p.c.b.m() == ("m", "http://kitakitsune.org/c/b", None)
+    assert p.d.c.b.m() == ("m", "http://kitakitsune.org/d/c/b", None)
+
+
+def test_data(r):
+    assert r.m(key="val") == ("m", "return", {"key": "val"})
+    assert r.m(k="v", x=1) == ("m", "return", {"k": "v", "x": 1})
+    assert r.b.m(k="v", x=1) == ("m", "return/b", {"k": "v", "x": 1})
+
+
+def test_special_characters(r):
+    assert r.azgabash__dot__txt.m() == ("m", "return/azgabash.txt", None)
+    assert r.azgabash__slash__txt.m() == ("m", "return/azgabash/txt", None)
+    assert r.azgabash__dash__txt.m() == ("m", "return/azgabash-txt", None)
+
+    # test multiple special characters in one attribute
+    assert r.aa__dash__aa__dot__txt.m() == ("m", "return/aa-aa.txt", None)
+
+    # test with multiple attributes
+    assert r.__dot__.__dash__.__slash__.m() == ("m", "return/./-//", None)
