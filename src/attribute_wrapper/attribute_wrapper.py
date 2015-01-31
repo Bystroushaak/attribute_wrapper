@@ -69,6 +69,10 @@ class GenericWrapper(object):
         url = self.get_url(True)
         url = self._replace_specials(url)
 
+        # call to root object
+        if not self.parent:
+            raise ValueError("Method not given.")
+
         # add suffix to non-domain urls
         if self.parent.parent and self.suffix:
             url += self.suffix
