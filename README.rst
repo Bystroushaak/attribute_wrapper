@@ -60,6 +60,14 @@ is translated to http://kitakitsune.org/raw/doctene_knihy.txt
 
 This functionality can be changed by replacing ``.specials`` dictionary table with something else, or with blank dictionary to disable it.
 
+Underscore method
++++++++++++++++++
+More complicated paths should be handled using ``_`` method::
+
+    r._("compl?icated/$path/").get()
+
+which is translated to http://kitakitsune.org/compl?icated/$path/.
+
 Automatic suffix
 ++++++++++++++++
 If you work with API, which expects that each file ends with suffix like ``.json`` or ``.html``, you can modify the ``.suffix`` attribute or add ``suffix`` parameter when you are instancing the class:

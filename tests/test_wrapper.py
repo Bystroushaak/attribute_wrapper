@@ -93,3 +93,7 @@ def test_automatic_suffix(p):
     assert p.m() == ("m", "http://kitakitsune.org", None)  # no suffix
     assert p.file.m() == ("m", "http://kitakitsune.org/file.txt", None)
     assert p.raw.file.m() == ("m", "http://kitakitsune.org/raw/file.txt", None)
+
+
+def test_underscore_method(r):
+    assert r._("a/~anyt$ů§hing").m() == ("m", "return/a/~anyt$ů§hing", None)

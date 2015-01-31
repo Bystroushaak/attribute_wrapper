@@ -69,7 +69,7 @@ class GenericWrapper(object):
         url = self.get_url(True)
         url = self._replace_specials(url)
 
-        # call to root object
+        # call to the root of the object
         if not self.parent:
             raise ValueError("Method not given.")
 
@@ -83,6 +83,12 @@ class GenericWrapper(object):
             url=url,
             data=kwargs if kwargs else None,
         )
+
+    def _(self, path):
+        """
+        Special underscore method for complicated paths.
+        """
+        return self.__class__(path, self, self.suffix)
 
     def _replace_specials(self, url):
         """
@@ -136,6 +142,9 @@ class GenericWrapper(object):
         """
         Take care of URL composition.
         """
+        if attr == "_":
+            return self.__class__(attr, self, self.suffix)
+
         return self.__dict__.get(
             attr,
             self.__class__(attr, self, self.suffix)
