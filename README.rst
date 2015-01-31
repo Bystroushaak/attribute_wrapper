@@ -127,3 +127,17 @@ and you can easily install it using the following command:
 .. code-block:: bash
 
     sudo pip install attribute_wrapper
+
+Testing
+-------
+This project uses `py.test <http://pytest.org/latest/>`_ for testing. Just run
+``py.test`` from the root of the project::
+
+    bystrousak:/h/D/c0d3z/python/libs/attribute_wrapper,0$ py.test
+    ============================= test session starts ==============================
+    platform linux2 -- Python 2.7.6 -- py-1.4.23 -- pytest-2.6.0
+    collected 8 items 
+
+    tests/test_wrapper.py ........
+
+    =========================== 8 passed in 0.12 seconds ===========================
