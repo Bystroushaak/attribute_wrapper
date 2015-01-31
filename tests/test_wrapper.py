@@ -79,3 +79,17 @@ def test_special_characters(r):
 
     # test with multiple attributes
     assert r.__dot__.__dash__.__slash__.m() == ("m", "return/./-//", None)
+
+
+def test_automatic_suffix(p):
+    p.suffix = ".txt"
+
+    assert p.m() == ("m", "http://kitakitsune.org", None)  # no suffix
+    assert p.file.m() == ("m", "http://kitakitsune.org/file.txt", None)
+
+    # test also constructor
+    p = ReturnWrapper("http://kitakitsune.org", suffix=".txt")
+
+    assert p.m() == ("m", "http://kitakitsune.org", None)  # no suffix
+    assert p.file.m() == ("m", "http://kitakitsune.org/file.txt", None)
+    assert p.raw.file.m() == ("m", "http://kitakitsune.org/raw/file.txt", None)
