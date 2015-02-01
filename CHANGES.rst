@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.2.1
+-----
+    - Fixed README.
+
 0.2.0
 -----
     - Added full test coverage.
